@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regelungstechnik Lernplan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f6f8; --card:#ffffff; --ink:#14171c; --muted:#646b76; --line:#e3e6eb;
+  --accent:#2457d6; --accent-soft:#e6edfc; --ok:#1f8a4c; --ok-soft:#e3f4ea;
+  --warn:#b8650a; --warn-soft:#fbefe0; --bad:#c23a3a; --bad-soft:#fbe7e7; --track:#e9ecf1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1115; --card:#171a20; --ink:#e8eaee; --muted:#9aa1ad; --line:#272b33;
+    --accent:#6f97ff; --accent-soft:#1c2640; --ok:#4cc27e; --ok-soft:#15291e;
+    --warn:#e5a04a; --warn-soft:#2c2214; --bad:#ef6b6b; --bad-soft:#2e1818; --track:#262a32;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1115; --card:#171a20; --ink:#e8eaee; --muted:#9aa1ad; --line:#272b33;
+  --accent:#6f97ff; --accent-soft:#1c2640; --ok:#4cc27e; --ok-soft:#15291e;
+  --warn:#e5a04a; --warn-soft:#2c2214; --bad:#ef6b6b; --bad-soft:#2e1818; --track:#262a32;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 16px 64px}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+h1{font-size:26px;margin:0;letter-spacing:-.02em}
+.sub{color:var(--muted);font-size:14px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.hero{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;margin-bottom:16px}
+.ring{position:relative;width:180px;height:180px}
+.ring svg{transform:rotate(-90deg)}
+.ring .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .pct{font-size:40px;font-weight:700;letter-spacing:-.03em}
+.ring .lbl{font-size:12px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.stat .v{font-size:24px;font-weight:700;letter-spacing:-.02em}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.bad{background:var(--bad-soft);color:var(--bad)}
+.hint{color:var(--muted);font-size:13px;margin-top:12px}
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.cat .top{display:flex;justify-content:space-between;align-items:baseline}
+.cat .name{font-weight:600;font-size:14px}
+.cat .p{font-size:20px;font-weight:700}
+.bar{position:relative;height:8px;background:var(--track);border-radius:99px;margin:10px 0 6px;overflow:visible}
+.bar .fill{height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+.bar .soll{position:absolute;top:-4px;width:2px;height:16px;background:var(--ink);opacity:.55;border-radius:2px}
+.cat .meta{font-size:12px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+h2{font-size:16px;margin:0 0 12px;letter-spacing:-.01em}
+.timeline{display:flex;gap:4px;margin:6px 0 8px}
+.phase{flex-grow:1;border-radius:8px;padding:8px 10px;font-size:12px;background:var(--track);color:var(--muted);min-width:0}
+.phase b{display:block;color:var(--ink);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.phase.now{background:var(--accent-soft);outline:2px solid var(--accent)}
+.phase.done{opacity:.6}
+ul.list{list-style:none;margin:0;padding:0}
+ul.list li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+ul.list li:first-child{border-top:0}
+ul.list li .t{flex:1;min-width:0}
+ul.list li .d{font-size:12px;color:var(--muted);white-space:nowrap}
+ul.list li.done .t{color:var(--muted);text-decoration:line-through}
+ul.list li.overdue .d{color:var(--bad);font-weight:600}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent);flex:none;cursor:pointer}
+.sec{margin-bottom:16px}
+.sec-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.sub-items{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;border:1px solid var(--line);border-radius:7px;padding:3px 8px;cursor:pointer;user-select:none}
+.chip input{width:14px;height:14px}
+.chip.on{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+.small{font-size:12px;color:var(--muted)}
+.pageinput{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pageinput input[type=number]{width:90px;font:inherit;font-size:20px;font-weight:700;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.addrow{display:flex;gap:8px;margin-top:10px}
+.addrow input{flex:1;font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);min-width:0}
+.x{border:0;background:none;color:var(--muted);font-size:16px;padding:2px 6px}
+.x:hover{color:var(--bad)}
+.empty{color:var(--muted);font-size:13px;padding:8px 0}
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .stats{grid-template-columns:repeat(3,1fr);width:100%}
+  .grid2{grid-template-columns:1fr}
+  .timeline{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Regelungstechnik</h1>
+      <div class="sub">Lernplan WS 26/27 · Klausur am <b>Mi, 17.03.2027</b></div>
+    </div>
+    <div class="toolbar">
+      <button id="exportBtn">Fortschritt exportieren</button>
+      <label class="btn">Importieren<input id="importFile" type="file" accept=".json" hidden></label>
+      <button id="themeBtn">Hell/Dunkel</button>
+    </div>
+  </header>
+
+  <section class="card hero">
+    <div class="ring">
+      <svg width="180" height="180" viewBox="0 0 180 180">
+        <circle cx="90" cy="90" r="78" fill="none" stroke="var(--track)" stroke-width="14"/>
+        <circle id="sollArc" cx="90" cy="90" r="78" fill="none" stroke="var(--ink)" stroke-opacity=".18" stroke-width="14" stroke-dasharray="0 999"/>
+        <circle id="istArc" cx="90" cy="90" r="78" fill="none" stroke="var(--accent)" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 999"/>
+      </svg>
+      <div class="center"><div class="pct mono" id="totalPct">0%</div><div class="lbl">Gesamtfortschritt</div></div>
+    </div>
+    <div>
+      <div class="stats">
+        <div class="stat"><div class="k">Noch</div><div class="v mono" id="daysLeft">–</div><div class="small">Tage bis zur Klausur</div></div>
+        <div class="stat"><div class="k">Soll heute</div><div class="v mono" id="sollPct">–</div><div class="small">laut Plan</div></div>
+        <div class="stat"><div class="k">Status</div><div class="v" id="statusPill">–</div><div class="small" id="statusTxt"></div></div>
+      </div>
+      <div class="hint">Blauer Ring = erledigt, grauer Ring = wo du laut Plan heute sein solltest. Der Strich auf den Balken unten zeigt den Soll-Stand pro Bereich.</div>
+    </div>
+  </section>
+
+  <section class="cats" id="cats"></section>
+
+  <section class="card sec">
+    <h2>Phasen</h2>
+    <div class="timeline" id="timeline"></div>
+  </section>
+
+  <div class="grid2">
+    <section class="card">
+      <h2>Fällig bis Sonntag</h2>
+      <ul class="list" id="weekList"></ul>
+    </section>
+    <section class="card">
+      <h2>Skript <span class="small">(nur relevante Abschnitte, ohne E/H)</span></h2>
+      <div class="pageinput"><span class="mono" style="font-size:28px;font-weight:700" id="pageRead">0</span><span class="small">von <span id="pagesTotal">0</span> Seiten gelesen</span></div>
+      <div class="bar" style="margin-top:14px"><div class="fill" id="pageFill" style="width:0"></div><div class="soll" id="pageSoll"></div></div>
+      <div class="small" id="pageTxt"></div>
+      <h2 style="margin-top:22px">Anki <span class="small">(optional, zählt nicht in die %)</span></h2>
+      <div class="pageinput">
+        <input type="number" id="ankiKnown" min="0" value="0"><span class="small">gelernt von</span>
+        <input type="number" id="ankiTotal" min="0" value="0"><span class="small">Karten</span>
+      </div>
+      <div class="small" id="ankiTxt" style="margin-top:6px"></div>
+    </section>
+  </div>
+
+  <section class="card sec">
+    <div class="sec-head"><h2>Vorlesungen</h2><span class="small" id="vlMeta"></span></div>
+    <ul class="list" id="vlList"></ul>
+  </section>
+
+  <section class="card sec">
+    <div class="sec-head"><h2>Skript</h2><span class="small" id="skMeta"></span></div>
+    <div class="small" style="margin-bottom:6px">Kapitel 13 und 16–20 sowie 11.2, 11.5, 14.6–14.9 sind nicht klausurrelevant (E/H) und fehlen hier bewusst.</div>
+    <ul class="list" id="skList"></ul>
+  </section>
+
+  <section class="card sec">
+    <div class="sec-head"><h2>Übungen</h2><span class="small" id="ueMeta"></span></div>
+    <div class="small" style="margin-bottom:6px">Erst selbst rechnen, dann Lösung prüfen. Die kommentierten Lösungen aus WS 25/26 helfen bei Fehlern.</div>
+    <ul class="list" id="ueList"></ul>
+  </section>
+
+  <section class="card sec">
+    <div class="sec-head"><h2>Treffpunkte (Klausuraufgaben)</h2><span class="small" id="tprMeta"></span></div>
+    <ul class="list" id="tprList"></ul>
+  </section>
+
+  <section class="card sec">
+    <div class="sec-head"><h2>Festigen</h2><span class="small">01.02. – 16.02.</span></div>
+    <ul class="list" id="fsList"></ul>
+  </section>
+
+  <section class="card sec">
+    <div class="sec-head"><h2>Altklausuren</h2><span class="small">17.02. – 15.03. · KV 2 am 23.02. beachten</span></div>
+    <ul class="list" id="akList"></ul>
+    <div class="addrow">
+      <input id="akName" placeholder="z. B. H24, F25 …">
+      <button id="akAdd">Hinzufügen</button>
+    </div>
+  </section>
+
+  <div class="small" style="text-align:center;margin-top:24px">Fortschritt wird in diesem Browser gespeichert. Für ein anderes Gerät: exportieren und dort importieren.</div>
+</div>
+
+<script>
+/* ======== KONFIGURATION (hier anpassen) ======== */
+const EXAM = "2027-03-17";
+const START = "2026-10-12";
+const AK_START = "2027-02-17", AK_END = "2027-03-15";
+const WEIGHTS = { vl:15, skript:20, ue:20, tpr:15, fs:10, ak:20 }; // Summe 100
+
+const PHASES = [
+  { name:"Erarbeiten", from:"2026-10-12", to:"2027-01-31", txt:"Vorlesung → Übung → Treffpunkt" },
+  { name:"Weihnachtspuffer", from:"2026-12-21", to:"2027-01-03", txt:"Rückstand aufholen" },
+  { name:"Festigen", from:"2027-02-01", to:"2027-02-16", txt:"Zusammenfassung, TPR ohne Lösung" },
+  { name:"Altklausuren", from:"2027-02-17", to:"2027-03-15", txt:"unter Zeitdruck" },
+  { name:"Vortag", from:"2027-03-16", to:"2027-03-16", txt:"nur Zusammenfassung" },
+];
+
+// Vorlesungen: Foliensatz-Seiten (zur Gewichtung) + Soll-Termin
+const VL = [
+  ["V01","Einführung",29,"2026-10-18"],
+  ["V02","Modellbildung",48,"2026-10-25"],
+  ["V03","Autonome Systeme",47,"2026-11-01"],
+  ["V04","Allgemeine Anregung",39,"2026-11-08"],
+  ["V05","Sinusförmige Anregung",53,"2026-11-15"],
+  ["V06","Verschaltung",55,"2026-11-22"],
+  ["V07","Typische Glieder",48,"2026-11-29"],
+  ["V08","Identifikation",29,"2026-12-06"],
+  ["V09","Stabilität",53,"2026-12-13"],
+  ["V10","Reglerentwurf I",34,"2026-12-20"],
+  ["V11","Reglerentwurf II",69,"2027-01-10"],
+  ["V12","Vermascht",53,"2027-01-17"],
+  ["V13","Zeitdiskret",44,"2027-01-24"],
+  ["V14","Kalman",64,"2027-01-31"],
+];
+
+// Treffpunkte: jede Aufgabe ist ein eigener Haken
+const TPR = [
+  ["TPR3","Modellierung & Zustandsraum","V02",["A1 (H25)","A2 (F18 A4)"],"2026-11-01"],
+  ["TPR1","Laplace-Transformation","V03/V04",["A1 (H21 A3)","A2 (F21 A3)"],"2026-11-15"],
+  ["TPR2","Frequenzgang","V05",["A1 (F02 A5)","A2 (F11 A5)"],"2026-11-22"],
+  ["TPR4","Stabilitätsüberprüfung","V09",["A1 Stabilitätskriterien","A2 (H25 A6)"],"2027-01-03"],
+  ["TPR5","Reglerentwurf 1","V10",["A1 (F22 A2)","A2 (H24 A2)"],"2027-01-10"],
+  ["TPR6","Reglerentwurf 2","V11",["A1 (H25 A3)","A2"],"2027-01-17"],
+  ["TPR7","Zeitdiskrete Systeme","V13",["A1 (H23 A7)","A2 (H10 A5)"],"2027-01-31"],
+  ["TPR8","Klausuraufgaben gemischt","alle",["A1 (H24)","A2 (F24)","A3 (F25)"],"2027-02-07"],
+];
+
+// Übungen: jedes Blatt zählt gleich viel, Aufgaben als Haken
+const UE = [
+  ["U0","Ingenieurwiss. Grundlagen","–",["0.1 Funktionen","0.2 Komplexe Zahlen","0.3 Grenzwerte","0.4 Differentialr.","0.5 Integralr.","0.6 Ungleichungen","0.7 PBZ","0.8 Polynomdiv.","0.9 Matrizen","0.10 Matrizenr.","0.11 Mechanik","0.12 Thermo"],"2026-10-25"],
+  ["U1","Regelung und Steuerung","V01",["1.1 Walzprozess","1.2 Segelboot"],"2026-10-25"],
+  ["U2","Modellbildung","V02",["2.1 Zustandsraum","2.2 Wirkungsplan"],"2026-11-01"],
+  ["U3","Linearisierung & autonome Systeme","V03",["3.1 Lin. Wirkungsplan","3.2 Lin. Zustandsraum","3.3 Stabilität & Transformation"],"2026-11-08"],
+  ["U4","Systemantworten & Laplace","V04",["4.1 Laplace","4.2 ÜF & Übergangsfkt.","4.3 Fragenteil"],"2026-11-15"],
+  ["U5","Frequenzbereich","V05",["5.1 Eingeschw. Zustand","5.2 Bode & Ortskurve","5.3 Filter","5.4 Fragenteil"],"2026-11-22"],
+  ["U6","Verschalten von Systemen","V06",["6.1 Rechenregeln ÜF","6.2 Reihenschaltung Bode","6.3 Zuordnung","6.4 Fragenteil"],"2026-11-29"],
+  ["U7","Typische Übertragungsglieder","V07",["7.1 Ortskurve","7.2 Bode","7.3 Fragenteil"],"2026-12-06"],
+  ["U8","Identifikation","V08",["8.1 Frequenzgänge","8.2 Tu-Tg-Modell","8.3 Kleinste Quadrate"],"2026-12-13"],
+  ["U9","Stabilitätsprüfung","V09",["9.1 Routh & Nyquist","9.2 Nyquist im Bode","9.3 Fragenteil"],"2026-12-20"],
+  ["U10","Reglerentwurf I","V10",["10.1 Einstellregeln","10.2 Regelfaktor & Bode","10.3 Fragenteil"],"2027-01-10"],
+  ["U11","Reglerentwurf II","V11",["11.1 Frequenzkennlinien","11.2 Polvorgabe & RNF","11.3 Beobachter","11.4 Fragenteil"],"2027-01-17"],
+  ["U12","Vermaschte Regelkreise","V12",["12.1 Regler & Steuerung","12.2 Führungsgrößenfilter","12.3 Vermaschung"],"2027-01-24"],
+  ["U13","Zeitdiskrete Systeme","V13",["13.1 Abtastung","13.2 Quasikontinuierlich"],"2027-01-31"],
+  ["U14","Kalmanfilter","V14",["14.1 Prädiktion & Korrektur","14.2 Zeitdiskreter ZR & Kalman","14.3 Zuordnung"],"2027-02-07"],
+];
+
+// Skript: nur relevante Abschnitte (ohne E/H). [Abschnitt, von, bis]
+const SK = [
+  ["K1","Einführung","V01","2026-10-18",[["1.1 Steuerung & Regelung",1,2],["1.2 Grundstruktur",3,8],["1.3 Beispiele",9,19]]],
+  ["K2","Modellbildung","V02","2026-10-25",[["2.1 Allgemeines",20,21],["2.2 DGLn",22,27],["2.3 Zustandsraum",28,32],["2.4 Wirkungsplan",33,34],["2.5 DGLn aufstellen",35,36],["2.6 Beispiele",37,46],["2.7 Sparsamkeit",47,48],["2.8 Einheiten",49,51]]],
+  ["K3","Autonome Systeme","V03","2026-11-01",[["3.1 Ruhelagen",52,55],["3.2 Stabilität",56,57],["3.3 Linearisierung",58,65],["3.4 Char. Polynom",66,71],["3.5 Lin.-Theorem",72,73],["3.6 Analyse im ZR",74,84]]],
+  ["K4","Allgemeine Anregung","V04","2026-11-08",[["4.1 Hom./part. Lösung",85,87],["4.2 Übergangsfunktion",88,90],["4.3 Faltung",91,96],["4.4 Laplace",97,106],["4.5 Übertragungsfkt.",107,111],["4.6 Grenzwertsätze",112,114]]],
+  ["K5","Sinusförmige Anregung","V05","2026-11-15",[["5.1 Frequenzgang",115,122],["5.2 Ortskurve",123,125],["5.3 Bode",126,129],["5.4 Fourier",130,132],["5.5 Filter",133,136]]],
+  ["K6","Verschaltungen","V06","2026-11-22",[["6.1 Zusammenfassen",137,144],["6.2 Zerlegung",145,152],["6.3 Nicht-minimalphasig",153,156]]],
+  ["K7","Typische Übertragungsglieder","V07","2026-11-29",[["7.1 Übersicht",157,163],["7.2 Reglertypen",164,174],["7.3 Verzögerungsglieder",175,185],["7.4 Kombinationen",186,192],["7.5 Nicht-minimalphasig",193,199]]],
+  ["K8","Identifikation","V08","2026-12-06",[["8.1 Allgemeines",200,202],["8.2 Nicht-parametrisch",203,204],["8.3 Parametrisch",205,213]]],
+  ["K9","Stabilitätsprüfung","V09","2026-12-13",[["9.1 Problemstellung",214,214],["9.2 Routh/Hurwitz",215,223],["9.3 Nyquist",224,251],["9.4 Sonderfälle",252,256]]],
+  ["K10","Einführung Reglerentwurf","V10","2026-12-20",[["10.1 Ziele",257,264],["10.2 Statisch",265,267],["10.3 Verstärkung",268,274],["10.4 Einstellregeln",275,278]]],
+  ["K11","Modellbasierter Reglerentwurf","V11","2027-01-10",[["11.1 Frequenzkennlinien",279,290],["11.3 Polvorgabe",297,305],["11.4 Beobachter",306,320]]],
+  ["K12","Vermaschte Regelkreise","V12","2027-01-17",[["12.1 Erweiterung",333,333],["12.2 Vorsteuerung",334,338],["12.3 Führungsgrößenfilter",339,341],["12.4 Störgrößenaufschaltung",342,343],["12.5 Kaskade",344,348],["12.6 Hilfsstellgröße",349,350]]],
+  ["K14","Zeitdiskrete Systeme","V13","2027-01-24",[["14.1 Abtastregelungen",375,383],["14.2 Differenzengl.",384,385],["14.3 Autonome zeitdiskr.",386,388],["14.4 Umrechnen",389,394],["14.5 Quasikontinuierlich",395,398]]],
+  ["K15","Kalmanfilter","V14","2027-01-31",[["15.1 Allgemeines",426,426],["15.2 Herleitung",427,435],["15.3 Auslegung",436,440],["15.4 Limitierungen",441,446]]],
+];
+const pg = x => x[2]-x[1]+1;
+const SK_TOTAL = SK.reduce((a,k)=>a+k[4].reduce((b,x)=>b+pg(x),0),0);
+
+const FS = [
+  ["fs1","Zusammenfassung (25 Folien) komplett durcharbeiten","2027-02-04"],
+  ["fs2","Eigene Formelsammlung / Spickzettel fertig","2027-02-08"],
+  ["fs3","TPR 1–4 nochmal ohne Lösung rechnen","2027-02-12"],
+  ["fs6","Alle Fragenteile der Übungen (4.3, 5.4, 6.4 …) nochmal beantworten","2027-02-14"],
+  ["fs4","TPR 5–8 nochmal ohne Lösung rechnen","2027-02-15"],
+  ["fs5","Anki: alle Karten können","2027-02-16"],
+];
+const DEFAULT_AK = ["Altklausur 1","Altklausur 2","Altklausur 3","Altklausur 4","Altklausur 5","Altklausur 6"];
+/* ================================================ */
+
+const KEY = "rt-lernplan-v1";
+const DAY = 864e5;
+const d = s => new Date(s + "T00:00:00");
+const today = (() => { const t = new Date(); t.setHours(0,0,0,0); return t; })();
+const fmt = s => d(s).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"});
+const $ = id => document.getElementById(id);
+
+let S = { done:{}, page:0, ankiKnown:0, ankiTotal:0, ak:DEFAULT_AK.map((n,i)=>({id:"ak"+i,name:n,done:false})) };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+
+const lin = (from,to) => Math.max(0, Math.min(1, (today - d(from)) / (d(to) - d(from) + DAY)));
+
+function calc(){
+  const vlTot = VL.reduce((a,v)=>a+v[2],0);
+  const vlIst = VL.reduce((a,v)=>a+(S.done[v[0]]?v[2]:0),0)/vlTot;
+  const vlSoll = VL.reduce((a,v)=>a+(d(v[3])<=today?v[2]:0),0)/vlTot;
+
+  let tTot=0,tIst=0,tSoll=0;
+  TPR.forEach(t=>t[3].forEach((_,i)=>{tTot++; if(S.done[t[0]+"_"+i]) tIst++; if(d(t[4])<=today) tSoll++;}));
+
+  let uIst=0,uSoll=0,uA=0,uT=0;
+  UE.forEach(u=>{ const n=u[3].length, k=u[3].filter((_,i)=>S.done[u[0]+"_"+i]).length;
+    uIst+=k/n; uA+=k; uT+=n; if(d(u[4])<=today) uSoll++; });
+  const fsIst = FS.filter(f=>S.done[f[0]]).length/FS.length;
+  const fsSoll = FS.filter(f=>d(f[2])<=today).length/FS.length;
+
+  const akN = S.ak.length;
+  const akIst = akN ? S.ak.filter(a=>a.done).length/akN : 0;
+  const akSoll = lin(AK_START, AK_END);
+
+  let skRead=0, skDue=0;
+  SK.forEach(k=>k[4].forEach((x,i)=>{ if(S.done[k[0]+"_"+i]) skRead+=pg(x); if(d(k[3])<=today) skDue+=pg(x); }));
+  const skIst = skRead/SK_TOTAL, skSoll = skDue/SK_TOTAL;
+
+  const cats = {
+    vl:{name:"Vorlesungen",ist:vlIst,soll:vlSoll,meta:`${VL.filter(v=>S.done[v[0]]).length}/${VL.length} Foliensätze`},
+    skript:{name:"Skript",ist:skIst,soll:skSoll,meta:`${skRead}/${SK_TOTAL} Seiten`, read:skRead, due:skDue},
+    ue:{name:"Übungen",ist:uIst/UE.length,soll:uSoll/UE.length,meta:`${uA}/${uT} Aufgaben`},
+    tpr:{name:"Treffpunkte",ist:tIst/tTot,soll:tSoll/tTot,meta:`${tIst}/${tTot} Aufgaben`},
+    fs:{name:"Festigen",ist:fsIst,soll:fsSoll,meta:`${FS.filter(f=>S.done[f[0]]).length}/${FS.length} Punkte`},
+    ak:{name:"Altklausuren",ist:akIst,soll:akSoll,meta:`${S.ak.filter(a=>a.done).length}/${akN} Klausuren`},
+  };
+  let ist=0,soll=0;
+  for (const k in cats){ ist+=cats[k].ist*WEIGHTS[k]; soll+=cats[k].soll*WEIGHTS[k]; }
+  return {cats, ist:ist/100, soll:soll/100};
+}
+
+const pct = x => Math.round(x*100) + "%";
+
+function render(){
+  const c = calc();
+  const C = 2*Math.PI*78;
+  $("istArc").setAttribute("stroke-dasharray", `${C*c.ist} ${C}`);
+  $("sollArc").setAttribute("stroke-dasharray", `${C*c.soll} ${C}`);
+  $("totalPct").textContent = pct(c.ist);
+  $("sollPct").textContent = pct(c.soll);
+  const left = Math.ceil((d(EXAM)-today)/DAY);
+  $("daysLeft").textContent = left > 0 ? left : (left===0 ? "heute" : "–");
+  const diff = Math.round((c.ist-c.soll)*100);
+  let cls="ok", t="im Plan";
+  if (diff>=3){ t="voraus"; } else if (diff<=-10){ cls="bad"; t="Rückstand"; } else if (diff<=-3){ cls="warn"; t="leicht hinten"; }
+  $("statusPill").innerHTML = `<span class="pill ${cls}">${t}</span>`;
+  $("statusTxt").textContent = (diff>0?"+":"") + diff + " Prozentpunkte";
+
+  $("cats").innerHTML = Object.entries(c.cats).map(([k,v])=>`
+    <div class="card cat">
+      <div class="top"><span class="name">${v.name}</span><span class="p mono">${pct(v.ist)}</span></div>
+      <div class="bar"><div class="fill" style="width:${v.ist*100}%;background:${v.ist>=v.soll?'var(--ok)':'var(--accent)'}"></div><div class="soll" style="left:calc(${v.soll*100}% - 1px)"></div></div>
+      <div class="meta">${v.meta} · Soll ${pct(v.soll)} · Gewicht ${WEIGHTS[k]}%</div>
+    </div>`).join("");
+
+  $("timeline").innerHTML = PHASES.map(p=>{
+    const now = d(p.from)<=today && today<=d(p.to), done = d(p.to)<today;
+    const len = Math.max(1,(d(p.to)-d(p.from))/DAY);
+    return `<div class="phase ${now?'now':''} ${done?'done':''}" style="flex-basis:${len}px"><b>${p.name}</b>${fmt(p.from)}–${fmt(p.to)} · ${p.txt}</div>`;
+  }).join("");
+
+  // Liste: Vorlesungen
+  $("vlList").innerHTML = VL.map(v=>row(v[0], `<b>${v[0]}</b> ${v[1]} <span class="small">· ${v[2]} Folien</span>`, v[3])).join("");
+  $("vlMeta").textContent = c.cats.vl.meta;
+
+  $("ueList").innerHTML = chipRows(UE, u=>`<b>Ü${u[0].slice(1)}</b> ${u[1]} <span class="small">· zu ${u[2]}</span>`);
+  $("ueMeta").textContent = c.cats.ue.meta;
+
+  // Treffpunkte
+  $("tprList").innerHTML = TPR.map(t=>{
+    const all = t[3].every((_,i)=>S.done[t[0]+"_"+i]);
+    const od = !all && d(t[4])<today;
+    const chips = t[3].map((a,i)=>{const id=t[0]+"_"+i,on=!!S.done[id];
+      return `<label class="chip ${on?'on':''}"><input type="checkbox" data-id="${id}" ${on?'checked':''}>${a}</label>`}).join("");
+    return `<li class="${all?'done':''} ${od?'overdue':''}"><div class="t"><b>${t[0]}</b> ${t[1]} <span class="small">· zu ${t[2]}</span><div class="sub-items">${chips}</div></div><span class="d">bis ${fmt(t[4])}</span></li>`;
+  }).join("");
+  $("tprMeta").textContent = c.cats.tpr.meta;
+
+  $("fsList").innerHTML = FS.map(f=>row(f[0], f[1], f[2])).join("");
+
+  $("akList").innerHTML = S.ak.length ? S.ak.map(a=>`
+    <li class="${a.done?'done':''}"><input type="checkbox" data-ak="${a.id}" ${a.done?'checked':''}><span class="t">${esc(a.name)}</span><button class="x" data-del="${a.id}" title="Entfernen">×</button></li>`).join("")
+    : `<li class="empty">Noch keine Altklausuren eingetragen.</li>`;
+
+  // Woche
+  const sun = new Date(today); sun.setDate(today.getDate() + ((7-today.getDay())%7));
+  const due = [];
+  VL.forEach(v=>{ if(!S.done[v[0]] && d(v[3])<=sun) due.push([v[0]+" "+v[1], v[3], v[0]]); });
+  UE.forEach(t=>{ t[3].forEach((a,i)=>{ const id=t[0]+"_"+i; if(!S.done[id] && d(t[4])<=sun) due.push(["Ü"+t[0].slice(1)+" · "+a, t[4], id]); }); });
+  TPR.forEach(t=>{ t[3].forEach((a,i)=>{ const id=t[0]+"_"+i; if(!S.done[id] && d(t[4])<=sun) due.push([t[0]+" · "+a, t[4], id]); }); });
+  FS.forEach(f=>{ if(!S.done[f[0]] && d(f[2])<=sun) due.push([f[1], f[2], f[0]]); });
+  SK.forEach(k=>{ k[4].forEach((x,i)=>{ const id=k[0]+"_"+i; if(!S.done[id] && d(k[3])<=sun) due.push(["Skript "+x[0]+" (S. "+x[1]+"–"+x[2]+")", k[3], id]); }); });
+  let html = due.sort((a,b)=>d(a[1])-d(b[1])).map(x=>row(x[2], x[0], x[1])).join("");
+  $("weekList").innerHTML = html || `<li class="empty">Alles erledigt für diese Woche 🎉</li>`;
+
+  // Skript
+  const sk = c.cats.skript;
+  $("pageFill").style.width = (sk.ist*100)+"%";
+  $("pageSoll").style.left = `calc(${sk.soll*100}% - 1px)`;
+  $("pageRead").textContent = sk.read;
+  $("pagesTotal").textContent = SK_TOTAL;
+  const pDiff = sk.read - sk.due;
+  const next = SK.find(k=>k[4].some((_,i)=>!S.done[k[0]+"_"+i]));
+  $("pageTxt").textContent = `Soll heute: ${sk.due} Seiten · ` + (pDiff>=0 ? `${pDiff} Seiten voraus` : `${-pDiff} Seiten hinten`) + (next ? ` · als Nächstes: Kap. ${next[0].slice(1)} ${next[1]}` : " · alles gelesen 🎉");
+  $("skList").innerHTML = chipRows(SK.map(k=>[k[0],k[1],k[2],k[4].map(x=>`${x[0]} <span class="small">S. ${x[1]===x[2]?x[1]:x[1]+"–"+x[2]}</span>`),k[3],k[4]]),
+    k=>{ const p=k[5].reduce((a,x)=>a+pg(x),0); return `<b>Kap. ${k[0].slice(1)}</b> ${k[1]} <span class="small">· zu ${k[2]} · ${p} Seiten</span>`; });
+  $("skMeta").textContent = sk.meta;
+
+  // Anki
+  if (document.activeElement !== $("ankiKnown")) $("ankiKnown").value = S.ankiKnown||0;
+  if (document.activeElement !== $("ankiTotal")) $("ankiTotal").value = S.ankiTotal||0;
+  $("ankiTxt").textContent = S.ankiTotal ? `${pct(Math.min(1,S.ankiKnown/S.ankiTotal))} der Karten sitzen` : "Trag die Kartenanzahl ein, sobald dein Stapel steht.";
+}
+
+function chipRows(arr, labelFn){
+  return arr.map(t=>{
+    const all = t[3].every((_,i)=>S.done[t[0]+"_"+i]);
+    const od = !all && d(t[4])<today;
+    const chips = t[3].map((a,i)=>{const id=t[0]+"_"+i,on=!!S.done[id];
+      return `<label class="chip ${on?'on':''}"><input type="checkbox" data-id="${id}" ${on?'checked':''}>${a}</label>`}).join("");
+    return `<li class="${all?'done':''} ${od?'overdue':''}"><div class="t">${labelFn(t)}<div class="sub-items">${chips}</div></div><span class="d">bis ${fmt(t[4])}</span></li>`;
+  }).join("");
+}
+function row(id, label, due){
+  const on = !!S.done[id], od = !on && d(due)<today;
+  return `<li class="${on?'done':''} ${od?'overdue':''}"><input type="checkbox" data-id="${id}" ${on?'checked':''}><span class="t">${label}</span><span class="d">${od?'überfällig · ':''}bis ${fmt(due)}</span></li>`;
+}
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+document.addEventListener("change", e=>{
+  const el = e.target;
+  if (el.dataset.id){ S.done[el.dataset.id] = el.checked; save(); render(); }
+  else if (el.dataset.ak){ const a=S.ak.find(x=>x.id===el.dataset.ak); if(a){a.done=el.checked; save(); render();} }
+});
+document.addEventListener("click", e=>{
+  const id = e.target.dataset && e.target.dataset.del;
+  if (id){ S.ak = S.ak.filter(a=>a.id!==id); save(); render(); }
+});
+["ankiKnown","ankiTotal"].forEach(k=>$(k).addEventListener("input", e=>{
+  let v = Math.max(0, parseInt(e.target.value)||0);
+  S[k]=v;
+  save(); render();
+}));
+$("akAdd").onclick = ()=>{ const n=$("akName").value.trim(); if(!n) return; S.ak.push({id:"ak"+Date.now(),name:n,done:false}); $("akName").value=""; save(); render(); };
+$("akName").addEventListener("keydown", e=>{ if(e.key==="Enter") $("akAdd").click(); });
+
+$("exportBtn").onclick = ()=>{
+  const b = new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(b);
+  a.download = "rt-fortschritt-" + new Date().toISOString().slice(0,10) + ".json"; a.click();
+};
+$("importFile").onchange = e=>{
+  const f = e.target.files[0]; if(!f) return;
+  f.text().then(t=>{ try{ S = Object.assign(S, JSON.parse(t)); save(); render(); }catch(err){ console.log("Import fehlgeschlagen", err); } });
+};
+$("themeBtn").onclick = ()=>{
+  const r = document.documentElement;
+  const dark = r.dataset.theme ? r.dataset.theme==="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  r.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem(KEY+"-theme", r.dataset.theme); } catch(e){}
+};
+try { const th = localStorage.getItem(KEY+"-theme"); if (th) document.documentElement.dataset.theme = th; } catch(e){}
+
+render();
+</script>
+</body>
+</html>
